@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.util.*;
 
-public class ProductPostRequestHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class ProductCatalogPostRequestHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 

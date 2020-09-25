@@ -1,13 +1,13 @@
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
-import com.chintan.handler.ProductPostRequestHandler;
+import com.chintan.handler.ProductCatalogPostRequestHandler;
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class ProductPostRequestHandlerTest {
-    private ProductPostRequestHandler handler;
+public class ProductCatalogPostRequestHandlerTest {
+    private ProductCatalogPostRequestHandler handler;
 
     @Test
     public void handleTest() {
@@ -23,7 +23,7 @@ public class ProductPostRequestHandlerTest {
                 "\"price\":\"100\"," +
                 "\"attributes\":{\"size\":\"M\"" + "}" +
                 "}");
-        this.handler = new ProductPostRequestHandler();
+        this.handler = new ProductCatalogPostRequestHandler();
         Object output = this.handler.handleRequest(request, null);
 
     }
