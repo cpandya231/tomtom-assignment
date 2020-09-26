@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 
 public class CartPostRequestHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
-    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
     AmazonDynamoDB client;
     DynamoDBMapper dynamoDBMapper;
 

@@ -23,13 +23,20 @@ import java.util.stream.Stream;
 
 public class ProductCatalogGetRequestHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
+    AmazonDynamoDB client;
+    DynamoDBMapper dynamoDBMapper;
+
+    public ProductCatalogGetRequestHandler() {
+        client = AmazonDynamoDBClientBuilder.standard().build();
+        dynamoDBMapper = new DynamoDBMapper(client);
+    }
+
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, Context context) {
 
-        AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
-        DynamoDBMapper mapper = new DynamoDBMapper(client);
+
         APIGatewayProxyResponseEvent apiGatewayProxyResponseEvent = new APIGatewayProxyResponseEvent();
         try {
-            List<ProductCatalog> productCatalog = getProducts(apiGatewayProxyRequestEvent, mapper);
+            List<ProductCatalog> productCatalog = getProducts(apiGatewayProxyRequestEvent);
             ObjectMapper objectMapper = new ObjectMapper();
             generateResponse(apiGatewayProxyResponseEvent, objectMapper.writeValueAsString(productCatalog));
         } catch (IOException e) {
@@ -38,17 +45,17 @@ public class ProductCatalogGetRequestHandler implements RequestHandler<APIGatewa
         return apiGatewayProxyResponseEvent;
     }
 
-    private List<ProductCatalog> getProducts(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, DynamoDBMapper mapper) {
+    private List<ProductCatalog> getProducts(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent) {
 
         String searchQuery = apiGatewayProxyRequestEvent.getQueryStringParameters().get("searchQuery");
-        List<ProductCatalog> scanResult = getProductCatalogsUsingScanOperation(mapper, searchQuery);
+        List<ProductCatalog> scanResult = getProductCatalogsUsingScanOperation(searchQuery);
 
-        List<ProductCatalog> queryResult = getProductCatalogsUsingQueryOperation(mapper, searchQuery);
+        List<ProductCatalog> queryResult = getProductCatalogsUsingQueryOperation(searchQuery);
         return Stream.concat(scanResult.stream(), queryResult.stream()).collect(Collectors.toList());
     }
 
 
-    private List<ProductCatalog> getProductCatalogsUsingScanOperation(DynamoDBMapper mapper, String searchQuery) {
+    private List<ProductCatalog> getProductCatalogsUsingScanOperation(String searchQuery) {
         Map<String, AttributeValue> scanOperationEAV = new HashMap<>();
         String scanConditionExpression = "contains(productName, :productName)";
         scanOperationEAV.put(":productName", new AttributeValue().withS(searchQuery.toLowerCase()));
@@ -56,16 +63,16 @@ public class ProductCatalogGetRequestHandler implements RequestHandler<APIGatewa
 
         scanExpression.withFilterExpression(scanConditionExpression)
                 .withExpressionAttributeValues(scanOperationEAV);
-        return mapper.scan(ProductCatalog.class, scanExpression);
+        return dynamoDBMapper.scan(ProductCatalog.class, scanExpression);
     }
 
-    private List<ProductCatalog> getProductCatalogsUsingQueryOperation(DynamoDBMapper mapper, String searchQuery) {
+    private List<ProductCatalog> getProductCatalogsUsingQueryOperation(String searchQuery) {
         Map<String, AttributeValue> queryOperationEAV = new HashMap<>();
         String queryConditionExpression = "productType = :productType";
         queryOperationEAV.put(":productType", new AttributeValue().withS(searchQuery.toLowerCase()));
         DynamoDBQueryExpression<ProductCatalog> queryExpression = new DynamoDBQueryExpression<>();
         queryExpression.withKeyConditionExpression(queryConditionExpression).withExpressionAttributeValues(queryOperationEAV);
-        List<ProductCatalog> queryResult = mapper.query(ProductCatalog.class, queryExpression);
+        List<ProductCatalog> queryResult = dynamoDBMapper.query(ProductCatalog.class, queryExpression);
         return queryResult;
     }
 

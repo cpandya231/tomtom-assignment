@@ -22,13 +22,21 @@ public class ProductCatalogPostRequestHandler implements RequestHandler<APIGatew
 
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
+    AmazonDynamoDB client;
+    DynamoDBMapper dynamoDBMapper;
+
+    public ProductCatalogPostRequestHandler() {
+        client = AmazonDynamoDBClientBuilder.standard().build();
+        dynamoDBMapper = new DynamoDBMapper(client);
+    }
+
+
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, Context context) {
 
-        AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
-        DynamoDBMapper mapper = new DynamoDBMapper(client);
+
         APIGatewayProxyResponseEvent apiGatewayProxyResponseEvent = new APIGatewayProxyResponseEvent();
         try {
-            ProductCatalog productCatalog = saveProductCatalog(apiGatewayProxyRequestEvent, mapper);
+            ProductCatalog productCatalog = saveProductCatalog(apiGatewayProxyRequestEvent);
             Map<String, String> responseBody = new HashMap<>();
             String productId = productCatalog.getProductId();
             responseBody.put("responseMessage", "Product " + productCatalog.getProductName() + " created with id: " + productId);
@@ -40,14 +48,14 @@ public class ProductCatalogPostRequestHandler implements RequestHandler<APIGatew
         return apiGatewayProxyResponseEvent;
     }
 
-    private ProductCatalog saveProductCatalog(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, DynamoDBMapper mapper) throws ParseException, IOException {
+    private ProductCatalog saveProductCatalog(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent) throws ParseException, IOException {
         String sellerId = apiGatewayProxyRequestEvent.getPathParameters().get("sellerId");
         String requestString = apiGatewayProxyRequestEvent.getBody();
         JSONParser parser = new JSONParser();
         System.out.println(requestString);
         JSONObject requestJsonObject = (JSONObject) parser.parse(requestString);
         ProductCatalog productCatalog = populateProductCatalog(sellerId, requestJsonObject);
-        mapper.save(productCatalog);
+        dynamoDBMapper.save(productCatalog);
         return productCatalog;
     }
 
