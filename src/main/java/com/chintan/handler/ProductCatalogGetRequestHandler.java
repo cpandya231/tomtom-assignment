@@ -3,6 +3,7 @@ package com.chintan.handler;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -17,10 +18,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ProductCatalogGetRequestHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
-
-    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, Context context) {
 
@@ -38,18 +39,36 @@ public class ProductCatalogGetRequestHandler implements RequestHandler<APIGatewa
     }
 
     private List<ProductCatalog> getProducts(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, DynamoDBMapper mapper) {
+
         String searchQuery = apiGatewayProxyRequestEvent.getQueryStringParameters().get("searchQuery");
-        Map<String, AttributeValue> expressionAttributeValuesMap = new HashMap<>();
-        String conditionExpression = "contains(productName, :productName)";
-        expressionAttributeValuesMap.put(":productName", new AttributeValue().withS(searchQuery));
+        List<ProductCatalog> scanResult = getProductCatalogsUsingScanOperation(mapper, searchQuery);
+
+        List<ProductCatalog> queryResult = getProductCatalogsUsingQueryOperation(mapper, searchQuery);
+        return Stream.concat(scanResult.stream(), queryResult.stream()).collect(Collectors.toList());
+    }
+
+
+    private List<ProductCatalog> getProductCatalogsUsingScanOperation(DynamoDBMapper mapper, String searchQuery) {
+        Map<String, AttributeValue> scanOperationEAV = new HashMap<>();
+        String scanConditionExpression = "contains(productName, :productName)";
+        scanOperationEAV.put(":productName", new AttributeValue().withS(searchQuery.toLowerCase()));
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
 
-        scanExpression.withFilterExpression(conditionExpression)
-                .withExpressionAttributeValues(expressionAttributeValuesMap);
-
+        scanExpression.withFilterExpression(scanConditionExpression)
+                .withExpressionAttributeValues(scanOperationEAV);
         return mapper.scan(ProductCatalog.class, scanExpression);
-
     }
+
+    private List<ProductCatalog> getProductCatalogsUsingQueryOperation(DynamoDBMapper mapper, String searchQuery) {
+        Map<String, AttributeValue> queryOperationEAV = new HashMap<>();
+        String queryConditionExpression = "productType = :productType";
+        queryOperationEAV.put(":productType", new AttributeValue().withS(searchQuery.toLowerCase()));
+        DynamoDBQueryExpression<ProductCatalog> queryExpression = new DynamoDBQueryExpression<>();
+        queryExpression.withKeyConditionExpression(queryConditionExpression).withExpressionAttributeValues(queryOperationEAV);
+        List<ProductCatalog> queryResult = mapper.query(ProductCatalog.class, queryExpression);
+        return queryResult;
+    }
+
 
     private void generateResponse(APIGatewayProxyResponseEvent apiGatewayProxyResponseEvent, String requestMessage) {
         apiGatewayProxyResponseEvent.setHeaders(Collections.singletonMap("timeStamp", String.valueOf(System.currentTimeMillis())));

@@ -53,12 +53,12 @@ public class ProductCatalogPostRequestHandler implements RequestHandler<APIGatew
 
     private ProductCatalog populateProductCatalog(String sellerId, JSONObject requestJsonObject) throws IOException {
         ProductCatalog productCatalog = new ProductCatalog();
-        productCatalog.setProductType(requestJsonObject.get("productType").toString());
+        productCatalog.setProductType(requestJsonObject.get("productType").toString().toLowerCase());
         productCatalog.setProductId(UUID.randomUUID().toString());
         productCatalog.setSellerId(sellerId);
-        productCatalog.setProductName(requestJsonObject.get("productName").toString());
-        productCatalog.setDescription(requestJsonObject.get("description").toString());
-        productCatalog.setSku(requestJsonObject.get("sku").toString());
+        productCatalog.setProductName(requestJsonObject.get("productName").toString().toLowerCase());
+        productCatalog.setDescription(requestJsonObject.get("description").toString().toLowerCase());
+        productCatalog.setSku(requestJsonObject.get("sku").toString().toLowerCase());
         productCatalog.setImageUrl(requestJsonObject.get("imageUrl").toString());
         productCatalog.setPrice(Double.valueOf(requestJsonObject.get("price").toString()));
         System.out.println(requestJsonObject.get("attributes"));
