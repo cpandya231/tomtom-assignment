@@ -13,7 +13,7 @@ public class Cart {
     private String userId;
 
     @DynamoDBAttribute
-    private List<CartProduct> cartProducts;
+    private List<ProductInfo> productInfoList;
 
     public String getUserId() {
         return userId;
@@ -23,11 +23,11 @@ public class Cart {
         this.userId = userId;
     }
 
-    public List<CartProduct> getCartProducts() {
-        return cartProducts;
+    public List<ProductInfo> getCartProducts() {
+        return productInfoList;
     }
 
-    public void setCartProducts(List<CartProduct> cartProducts) {
-        this.cartProducts = cartProducts;
+    public void setCartProducts(List<ProductInfo> productInfos) {
+        this.productInfoList = productInfos;
     }
 }

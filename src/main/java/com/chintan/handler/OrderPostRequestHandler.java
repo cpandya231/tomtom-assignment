@@ -11,22 +11,25 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.chintan.entity.Cart;
 import com.chintan.entity.ProductInfo;
+import com.chintan.entity.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.ZoneOffset;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class CartPostRequestHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class OrderPostRequestHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+
+    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
     AmazonDynamoDB client;
     DynamoDBMapper dynamoDBMapper;
 
-    public CartPostRequestHandler() {
+    public OrderPostRequestHandler() {
         client = AmazonDynamoDBClientBuilder.standard().build();
         dynamoDBMapper = new DynamoDBMapper(client);
     }
@@ -36,10 +39,9 @@ public class CartPostRequestHandler implements RequestHandler<APIGatewayProxyReq
 
         APIGatewayProxyResponseEvent apiGatewayProxyResponseEvent = new APIGatewayProxyResponseEvent();
         try {
-            Cart cart = saveItemsToUserCart(apiGatewayProxyRequestEvent);
+            User user = saveOrderDetails(apiGatewayProxyRequestEvent);
             Map<String, String> responseBody = new HashMap<>();
-            String userId = cart.getUserId();
-            responseBody.put("responseMessage", "Products added to " + userId + "'s cart ");
+            responseBody.put("responseMessage", "Order created for user  " + user.getUserId() + ". OrderId: " + user.getOrderId());
             String responseMessage = new JSONObject(responseBody).toJSONString();
             generateResponse(apiGatewayProxyResponseEvent, responseMessage);
         } catch (ParseException | IOException e) {
@@ -48,27 +50,26 @@ public class CartPostRequestHandler implements RequestHandler<APIGatewayProxyReq
         return apiGatewayProxyResponseEvent;
     }
 
-    private Cart saveItemsToUserCart(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent) throws ParseException, IOException {
+    private User saveOrderDetails(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent) throws ParseException, IOException {
         String userId = apiGatewayProxyRequestEvent.getPathParameters().get("userId");
 
         String requestString = apiGatewayProxyRequestEvent.getBody();
         JSONParser parser = new JSONParser();
         System.out.println(requestString);
         JSONObject requestJsonObject = (JSONObject) parser.parse(requestString);
-        List<ProductInfo> requestedProductInfos = Arrays.asList(new ObjectMapper().readValue(requestJsonObject.get("products").toString(), ProductInfo[].class));
-        Optional<Cart> cartOptional = getCartInfo(userId);
-        Cart cart;
-        if (cartOptional.isPresent()) {
-            cart = cartOptional.get();
-            List<ProductInfo> existingProductInfos = cart.getCartProducts();
-            cart.setCartProducts(Stream.concat(existingProductInfos.stream()
-                    , requestedProductInfos.stream()).collect(Collectors.toList()));
-        } else {
-            cart = populateCart(userId, requestedProductInfos);
-        }
+        ProductInfo requestedProductInfo = new ObjectMapper().readValue(requestJsonObject.get("productInfo").toString(), ProductInfo.class);
+        User user = new User();
+        user.setUserId(userId);
+        user.setOrderId(UUID.randomUUID().toString());
+        user.setTransactionId(requestJsonObject.get("transactionId").toString());
+        user.setStatus(requestJsonObject.get("status").toString());
+        user.setProductInfo(requestedProductInfo);
+        SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+        formatter.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+        user.setCreatedAt(formatter.format(new Date()));
 
-        dynamoDBMapper.save(cart);
-        return cart;
+        dynamoDBMapper.save(user);
+        return user;
     }
 
     private Optional<Cart> getCartInfo(String userId) {
