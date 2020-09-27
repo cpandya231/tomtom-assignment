@@ -1,0 +1,219 @@
+{
+	"info": {
+		"_postman_id": "acdb9696-3d0b-4ef8-a120-d9595ea89368",
+		"name": "TomTom Assignement for eCommerce application",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add product",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "bXkIbZcTi15uarc5XkjIB5ETwMW77Gzw45HVjIwc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"productType\": \"electronics\",\r\n    \"productName\": \"Nx320 Stereo Headset With Foldable Microphone\",\r\n    \"description\": \"Compatible with ps4, xb1, switch, smartphones, laptops and pc\",\r\n    \"sku\": \"PPDFF\",\r\n    \"imageUrl\": \"url\",\r\n    \"price\": \"4999\",\r\n    \"attributes\": {\r\n        \"color\": \"black\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://7wmxx874z6.execute-api.us-east-1.amazonaws.com/default/product/s_82871d22-ce5e-4ea8-bbc8-dc637a668147",
+					"protocol": "https",
+					"host": [
+						"7wmxx874z6",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"default",
+						"product",
+						"s_82871d22-ce5e-4ea8-bbc8-dc637a668147"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add products to cart",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"type": "text",
+						"value": "bXkIbZcTi15uarc5XkjIB5ETwMW77Gzw45HVjIwc"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \t\"products\": [{\r\n\t\t\"productId\": \"61c6b1f3-0dc5-450b-b743-516ae61d2484\",\r\n\t\t\"productType\": \"electronics\",\r\n\t\t\"productName\": \"Samsung Galaxy M51 (Electric Blue, 6GB RAM, 128GB Storage)\",\r\n\t\t\"quantity\": 1,\r\n        \"imageUrl\":\"imgurl\"\r\n\t}]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://7wmxx874z6.execute-api.us-east-1.amazonaws.com/default/cart/u_82871d22-ce5e-4ea8-bbc8-dc637a668147",
+					"protocol": "https",
+					"host": [
+						"7wmxx874z6",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"default",
+						"cart",
+						"u_82871d22-ce5e-4ea8-bbc8-dc637a668147"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create order",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"type": "text",
+						"value": "bXkIbZcTi15uarc5XkjIB5ETwMW77Gzw45HVjIwc"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"transactionId\": \"abc\",\r\n    \"status\": \"Placed\",\r\n    \"productInfo\": {\r\n        \"productId\": \"1b2d1a85-8154-4a99-bd79-b54993d13529\",\r\n        \"productName\": \"Nx320 Stereo Headset With Foldable Microphone\",\r\n        \"productType\": \"electronics\",\r\n        \"quantity\": 1\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://7wmxx874z6.execute-api.us-east-1.amazonaws.com/default/order/u_82871d22-ce5e-4ea8-bbc8-dc637a668147",
+					"protocol": "https",
+					"host": [
+						"7wmxx874z6",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"default",
+						"order",
+						"u_82871d22-ce5e-4ea8-bbc8-dc637a668147"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get products",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"type": "text",
+						"value": "bXkIbZcTi15uarc5XkjIB5ETwMW77Gzw45HVjIwc"
+					}
+				],
+				"url": {
+					"raw": "https://7wmxx874z6.execute-api.us-east-1.amazonaws.com/default/product?searchQuery=Nx320",
+					"protocol": "https",
+					"host": [
+						"7wmxx874z6",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"default",
+						"product"
+					],
+					"query": [
+						{
+							"key": "searchQuery",
+							"value": "Nx320"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get cart",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"type": "text",
+						"value": "bXkIbZcTi15uarc5XkjIB5ETwMW77Gzw45HVjIwc"
+					}
+				],
+				"url": {
+					"raw": "https://7wmxx874z6.execute-api.us-east-1.amazonaws.com/default/cart?userId=u_82871d22-ce5e-4ea8-bbc8-dc637a668147",
+					"protocol": "https",
+					"host": [
+						"7wmxx874z6",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"default",
+						"cart"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "u_82871d22-ce5e-4ea8-bbc8-dc637a668147"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "bc5feaa8-96d2-4354-9bd1-20b784ce82bf",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "818ef9be-e201-4a82-8b92-9f07a38a6e67",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
