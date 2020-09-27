@@ -1,13 +1,13 @@
 # tomtom-assignment
 
-### `Build`
+### Build
 ```
 mvn clean install -DskipTests
 
 Build without tests as unit tests actually communicates with DynamoDB and you won't have access to it
 ```
 
-### `Test APIs`
+### Test APIs
 
 Import ```TomTom Assignement for eCommerce application.postman_collection.json``` in [postman](https://www.postman.com/)
 
