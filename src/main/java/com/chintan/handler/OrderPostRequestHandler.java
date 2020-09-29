@@ -69,26 +69,27 @@ public class OrderPostRequestHandler implements RequestHandler<APIGatewayProxyRe
         user.setCreatedAt(formatter.format(new Date()));
 
         dynamoDBMapper.save(user);
+
+        updateCart(userId, requestedProductInfo.getProductId());
         return user;
     }
 
-    private Optional<Cart> getCartInfo(String userId) {
+    private void updateCart(String userId, String productId) {
+        Cart cart = getCartInfo(userId);
+        cart.getCartProducts().removeIf(productInfo -> productInfo.getProductId().equalsIgnoreCase(productId));
+        dynamoDBMapper.save(cart);
+    }
+
+    private Cart getCartInfo(String userId) {
         Map<String, AttributeValue> queryOperationEAV = new HashMap<>();
         String queryConditionExpression = "userId = :userId";
         queryOperationEAV.put(":userId", new AttributeValue().withS(userId.toLowerCase()));
         DynamoDBQueryExpression<Cart> queryExpression = new DynamoDBQueryExpression<>();
         queryExpression.withKeyConditionExpression(queryConditionExpression).withExpressionAttributeValues(queryOperationEAV);
 
-        return dynamoDBMapper.query(Cart.class, queryExpression).stream().findFirst();
+        return dynamoDBMapper.query(Cart.class, queryExpression).stream().findFirst().get();
     }
 
-
-    private Cart populateCart(String userId, List<ProductInfo> requestedProductInfos) {
-        Cart cart = new Cart();
-        cart.setUserId(userId);
-        cart.setCartProducts(requestedProductInfos);
-        return cart;
-    }
 
     private void generateResponse(APIGatewayProxyResponseEvent apiGatewayProxyResponseEvent, String requestMessage) {
         apiGatewayProxyResponseEvent.setHeaders(Collections.singletonMap("timeStamp", String.valueOf(System.currentTimeMillis())));
