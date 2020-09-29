@@ -18,7 +18,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"productType\": \"electronics\",\r\n    \"productName\": \"Nx320 Stereo Headset With Foldable Microphone\",\r\n    \"description\": \"Compatible with ps4, xb1, switch, smartphones, laptops and pc\",\r\n    \"sku\": \"PPDFF\",\r\n    \"imageUrl\": \"url\",\r\n    \"price\": \"4999\",\r\n    \"attributes\": {\r\n        \"color\": \"black\"\r\n    }\r\n}",
+					"raw": "{\r\n    \"productType\": \"electronics\",\r\n    \"productName\": \"Samsung Galaxy M51 (Electric Blue, 6GB RAM, 128GB Storage)\",\r\n    \"description\": \"Quad camera setup - 64MP (F1.8) main camera + 12MP (F2.2) ultra wide camera + 5MP (F2.4) depth camera + 5MP (F2.4) macro camera and 32MP (F2.2) front camera\",\r\n    \"sku\": \"PPDFF\",\r\n    \"imageUrl\": \"url\",\r\n    \"price\": \"24999\",\r\n    \"attributes\": {\r\n        \"color\": \"black\"\r\n    }\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -96,7 +96,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"transactionId\": \"abc\",\r\n    \"status\": \"Placed\",\r\n    \"productInfo\": {\r\n        \"productId\": \"1b2d1a85-8154-4a99-bd79-b54993d13529\",\r\n        \"productName\": \"Nx320 Stereo Headset With Foldable Microphone\",\r\n        \"productType\": \"electronics\",\r\n        \"quantity\": 1\r\n    }\r\n}",
+					"raw": "{\r\n    \"transactionId\": \"abc\",\r\n    \"status\": \"Placed\",\r\n    \"productInfo\": {\r\n        \"productId\": \"1b2d1a85-8154-4a99-bd79-b54993d13529\",\r\n        \"productName\": \"Nx320 Stereo Headset With Foldable Microphone\",\r\n        \"productType\": \"electronics\",\r\n        \"quantity\": 1,\r\n        \"imageUrl\":\"abc\"\r\n    }\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -187,6 +187,36 @@
 							"key": "userId",
 							"value": "u_82871d22-ce5e-4ea8-bbc8-dc637a668147"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get orders",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"type": "text",
+						"value": "bXkIbZcTi15uarc5XkjIB5ETwMW77Gzw45HVjIwc"
+					}
+				],
+				"url": {
+					"raw": "https://7wmxx874z6.execute-api.us-east-1.amazonaws.com/default/order/u_82871d22-ce5e-4ea8-bbc8-dc637a668147",
+					"protocol": "https",
+					"host": [
+						"7wmxx874z6",
+						"execute-api",
+						"us-east-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"default",
+						"order",
+						"u_82871d22-ce5e-4ea8-bbc8-dc637a668147"
 					]
 				}
 			},
